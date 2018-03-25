@@ -53,19 +53,32 @@ class Game {
     }
 
     run() {
+        this.runner.enabled = true;
         this.Runner.run(this.runner, this.engine);    
     }
 
     stop() {
-        this.Render.stop(this.renderer);
         this.Runner.stop(this.runner);
+        this.runner.enabled = false;
+    }
+
+    reset() {
+        this.Runner.stop(this.runner);
+        this._clearWorld();
     }
 
     addBlock() {
+        if (!this.runner.enabled) {
+            return;
+        }
         this.World.add(this.world, [
             // falling blocks
             this.Bodies.rectangle(150, 100, 60, 60, { frictionAir: 0.05 }),
         ]); 
+    }
+
+    _clearWorld() {
+        this.World.clear(this.world, true);
     }
 
     _createWorld(engine) {
@@ -104,7 +117,9 @@ class Game {
     }
 
     _createRunner() {
-        return this.Runner.create();
+        return this.Runner.create({
+            enabled: false
+        });
     }
 
     _setWalls(world) {
