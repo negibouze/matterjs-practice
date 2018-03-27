@@ -4,10 +4,12 @@
   "description": "matterjs practice",
   "main": "index.js",
   "scripts": {
-    "dev": "webpack-dev-server",
-    "build": "webpack --mode production",
-    "clean": "rimraf ./dist",
-    "rebuild": "npm-run-all -s clean build"
+    "start": "webpack-dev-server",
+    "build": "webpack --env.production",
+    "build:dev": "webpack",
+    "clean": "rimraf ./public/assets",
+    "rebuild": "npm-run-all -s clean build",
+    "rebuild:dev": "npm-run-all -s clean build:dev"
   },
   "author": "Yoshiaki Itakura (https://github.com/negibouze)",
   "license": "MIT",

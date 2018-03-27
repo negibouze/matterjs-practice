@@ -7,7 +7,16 @@
     <title>Matter.js practice</title>
     <style>
         .container {
-            width: 300px;
+            width: 400px;
+            height: 800px;
+            margin: 0 auto;
+        }
+        .btn-container {
+            width: 100%;
+            margin: 0 auto;
+        }
+        .screen {
+            width: 400px;
             height: 600px;
         }
         .btn {
@@ -30,12 +39,21 @@
     </style>
 </head>
 <body>
-    <div id="container" class="container"></div>
-    <button id="start" class="btn">START</button>
-    <button id="add" class="btn" disabled>ADD</button>
-    <button id="stop" class="btn" disabled>STOP</button>
-    <button id="reset" class="btn" disabled>RESET</button>
-    <script src="./dist/vendors.js"></script>
-    <script src="./dist/bundle.js"></script>
+    <div id="container" class="container">
+        <div id="screen" class="screen"></div>
+        <div class="btn-container">
+            <button id="start" class="btn">START</button>
+            <button id="rotate" class="btn" disabled>ROTATE</button>
+            <button id="go" class="btn" disabled>GO</button>
+            <button id="stop" class="btn" disabled>STOP</button>
+            <button id="reset" class="btn" disabled>RESET</button>
+        </div>
+        <div class="btn-container">
+            <button id="left" class="btn" disabled>＜ー</button>
+            <button id="right" class="btn" disabled>ー＞</button>
+        </div>
+        <script src="./assets/vendors.js"></script>
+        <script src="./assets/bundle.js"></script>
+    </div>
 </body>
 </html>

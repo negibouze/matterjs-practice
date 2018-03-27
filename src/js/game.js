@@ -1,12 +1,15 @@
 class Game {
     constructor() {
         this.Engine = matter.Engine;
+        this.Events = matter.Events;
         this.Render = matter.Render;
         this.Runner = matter.Runner;
         this.MouseConstraint = matter.MouseConstraint;
         this.Mouse = matter.Mouse;
         this.World = matter.World;
         this.Bodies = matter.Bodies;
+        this.Body = matter.Body;
+        this.Vector = matter.Vector;
     }
 
     init(fieldObject) {
@@ -19,22 +22,19 @@ class Game {
         this.field = {
             object: fieldObject,
             width: w,
-            height: h
+            height: h,
+            center: {
+                x: w / 2,
+                y: h / 2
+            }
         }
         // create engine
-        const engine = this.Engine.create();
+        const engine = this.Engine.create({ enableSleeping: true });
         const world = this._createWorld(engine);
         // create renderer
         const renderer = this._createRenderer(engine);
-        // add mouse control
-        const mouse = this._createMouse(renderer.canvas);
-        // keep the mouse in sync with rendering
-        renderer.mouse = mouse;
-        const mouseConstraint = this._createMouseConstraint(engine, mouse);
 
         this._setWalls(world);
-        this._setMouseConstraint(world, mouseConstraint);
-
         // fit the render viewport to the scene
         this.Render.lookAt(renderer, {
             min: { x: 0, y: 0 },
@@ -46,6 +46,11 @@ class Game {
         this.renderer = renderer;
         // create runner
         this.runner = this._createRunner();
+        this.rotation = this._getRadian(45);
+        this.block = null;
+        // this.Events.on(this.engine, "collisionStart", (e) => {
+        //     console.log(e);
+        // });
     }
 
     render() {
@@ -54,7 +59,18 @@ class Game {
 
     run() {
         this.runner.enabled = true;
-        this.Runner.run(this.runner, this.engine);    
+        this.Runner.run(this.runner, this.engine);
+        if (!this.block) {
+            this._addBlock();
+        }  
+    }
+
+    rotate() {
+        this.Body.rotate(this.block, this.rotation);
+    }
+
+    go() {
+        this.Body.set(this.block, { frictionAir: 0.01 });
     }
 
     stop() {
@@ -67,13 +83,29 @@ class Game {
         this._clearWorld();
     }
 
-    addBlock() {
+    left() {
+        this.Body.translate(this.block, this.Vector.create(-10));
+    }
+
+    right() {
+        this.Body.translate(this.block, this.Vector.create(10));
+    }
+
+    _addBlock() {
         if (!this.runner.enabled) {
             return;
         }
+        this.block = this._createBlock();
+        this.Events.on(this.block, 'sleepStart', (e) => {
+            if (this.block.isSleeping) {
+                this.Events.off(this.block, 'sleepStart')
+                this._addBlock();
+            }
+        });
+
         this.World.add(this.world, [
             // falling blocks
-            this.Bodies.rectangle(150, 100, 60, 60, { frictionAir: 0.05 }),
+            this.block
         ]); 
     }
 
@@ -99,23 +131,6 @@ class Game {
         return renderer;
     }
 
-    _createMouse(canvas) {
-        return this.Mouse.create(canvas);
-    }
-
-    _createMouseConstraint(engine, mouse) {
-        const mc = this.MouseConstraint.create(engine, {
-            mouse: mouse,
-            constraint: {
-                stiffness: 0.2,
-                render: {
-                    visible: false
-                }
-            }
-        });
-        return mc;
-    }
-
     _createRunner() {
         return this.Runner.create({
             enabled: false
@@ -123,19 +138,31 @@ class Game {
     }
 
     _setWalls(world) {
-        const w = this.field.width;
-        const h = this.field.height;
+        const w = this.field.width - 40;
+        const h = this.field.height - 40;
         this.World.add(world, [
             // walls
-            this.Bodies.rectangle(0, 0, 600, 20, { isStatic: true }),
-            this.Bodies.rectangle((w - 20), 0, 20, h, { isStatic: true }),
-            this.Bodies.rectangle(0, h, w, 20, { isStatic: true }),
-            this.Bodies.rectangle(0, 0, 20, h, { isStatic: true })
+            this.Bodies.rectangle(this.field.center.x, h, w, 20, { isStatic: true }),
         ]);
     }
 
     _setMouseConstraint(world, mouseConstraint) {
         this.World.add(world, mouseConstraint);
+    }
+
+    _createBlock() {
+        const angle = this._getRadian(this._getRandomInt(0, 360));
+        const w = this._getRandomInt(25, 50);
+        const h = this._getRandomInt(25, 50);
+        return this.Bodies.rectangle(this.field.center.x, 20, w, h, { angle, anglesleepThreshold: 60, frictionAir: 0.5 });
+    }
+
+    _getRandomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    _getRadian(degree) {
+        return (degree * Math.PI) / 180;
     }
 }
 

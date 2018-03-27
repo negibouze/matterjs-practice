@@ -1,12 +1,16 @@
 import Game from './game';
 
-const start = document.getElementById('start');
-const add = document.getElementById('add');
-const stop = document.getElementById('stop');
-const reset = document.getElementById('reset');
+const screen = document.getElementById('screen')
+const startButton = document.getElementById('start')
+const rotateButton = document.getElementById('rotate')
+const goButton = document.getElementById('go')
+const stopButton = document.getElementById('stop')
+const resetButton = document.getElementById('reset')
+const leftButton = document.getElementById('left')
+const rightButton = document.getElementById('right')
 
 const game = new Game();
-game.init(document.getElementById('container'));
+game.init(screen);
 game.render();
 
 const play = () => {
@@ -14,8 +18,12 @@ const play = () => {
     buttonState.playing();
 }
 
-const addBlock = () => {
-    game.addBlock();
+const rotate = () => {
+    game.rotate();
+}
+
+const go = () => {
+    game.go();
 }
 
 const pause = () => {
@@ -28,32 +36,57 @@ const retry = () => {
     game.reset();
 }
 
+const left = () => {
+    game.left();
+}
+
+const right = () => {
+    game.right();
+}
+
 const addClickEvent = (obj, fn) => {
     obj.addEventListener('click', fn);
 }
 
 const buttonState = {
     init: () => {
-        start.disabled = false;
-        add.disabled = true;
-        stop.disabled = true;
-        reset.disabled = true;
+        buttonState.disableAll();
+        startButton.disabled = false;
     },
     playing: () => {
-        start.disabled = true;
-        add.disabled = false;
-        stop.disabled = false;
-        reset.disabled = true;
+        buttonState.enableAll();
+        startButton.disabled = true;
+        resetButton.disabled = true;
     },
     pause: () => {
-        start.disabled = false;
-        add.disabled = true;
-        stop.disabled = true;
-        reset.disabled = false;
+        buttonState.enableAll();
+        goButton.disabled = true;
+        stopButton.disabled = true;
+    },
+    enableAll: () => {
+        startButton.disabled = false;
+        rotateButton.disabled = false;
+        goButton.disabled = false;
+        stopButton.disabled = false;
+        resetButton.disabled = false;
+        leftButton.disabled = false;
+        rightButton.disabled = false;
+    },
+    disableAll: () => {
+        startButton.disabled = true;
+        rotateButton.disabled = true;
+        goButton.disabled = true;
+        stopButton.disabled = true;
+        resetButton.disabled = true;
+        leftButton.disabled = true;
+        rightButton.disabled = true;
     }
 }
 
-addClickEvent(start, play);
-addClickEvent(add, addBlock);
-addClickEvent(stop, pause);
-addClickEvent(reset, retry);
+addClickEvent(startButton, play);
+addClickEvent(rotateButton, rotate);
+addClickEvent(goButton, go);
+addClickEvent(stopButton, pause);
+addClickEvent(resetButton, retry);
+addClickEvent(leftButton, left);
+addClickEvent(rightButton, right);
